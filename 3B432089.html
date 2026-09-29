@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>你好</title>
+
+    <!-- 國際電話號碼驗證套件 -->
+    <script src="https://cdn.jsdelivr.net/npm/libphonenumber-js@1.12.29/bundle/libphonenumber-max.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft JhengHei", Arial, sans-serif;
+            background-color: #f2f6fc;
+            color: #333;
+        }
+
+        /* =========================
+           Header
+        ========================= */
+
+        header {
+            background: linear-gradient(135deg, #4a90e2, #6a5acd);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        header h1 {
+            margin: 0 0 10px;
+            font-size: 42px;
+        }
+
+        header p {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        /* =========================
+           Nav
+        ========================= */
+
+        nav {
+            background-color: #ffffff;
+            text-align: center;
+            padding: 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        nav a {
+            color: #444;
+            text-decoration: none;
+            margin: 0 20px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #4a90e2;
+        }
+
+        /* =========================
+           Main
+        ========================= */
+
+        main {
+            width: 90%;
+            max-width: 1200px;
+
+            margin: 40px auto;
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 16px;
+
+            justify-content: center;
+
+            align-items: start;
+        }
+
+        /* =========================
+           Section
+        ========================= */
+
+        section {
+            background-color: white;
+
+            padding: 35px;
+
+            border-radius: 15px;
+
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        section h2 {
+            color: #4a90e2;
+
+            border-left: 5px solid #4a90e2;
+
+            padding-left: 12px;
+
+            margin-top: 0;
+        }
+
+        /* =========================
+           個人資料
+        ========================= */
+
+        .info p {
+            font-size: 18px;
+
+            line-height: 1.8;
+
+            border-bottom: 1px solid #eee;
+
+            padding-bottom: 8px;
+        }
+
+        /* =========================
+           自我介紹
+        ========================= */
+
+        .introduction {
+            min-height: 150px;
+
+            line-height: 2;
+        }
+
+        /* =========================
+           Form
+        ========================= */
+
+        form {
+            display: flex;
+
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 15px;
+
+            margin-bottom: 6px;
+
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+
+            border-color: #4a90e2;
+
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        /* =========================
+           Email 驗證
+        ========================= */
+
+        .email-error {
+            display: none;
+
+            color: #e74c3c;
+
+            font-size: 14px;
+
+            margin-top: 6px;
+        }
+
+        .email-valid {
+            border-color: #2ecc71 !important;
+
+            box-shadow: 0 0 5px rgba(46, 204, 113, 0.25) !important;
+        }
+
+        .email-invalid {
+            border-color: #e74c3c !important;
+
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.25) !important;
+        }
+
+        /* =========================
+           電話
+        ========================= */
+
+        .phone-group {
+            display: flex;
+
+            gap: 8px;
+        }
+
+        .country-code {
+            width: 42%;
+        }
+
+        .phone-number {
+            width: 58%;
+        }
+
+        .phone-error {
+            display: none;
+
+            color: #e74c3c;
+
+            font-size: 14px;
+
+            margin-top: 6px;
+        }
+
+        .phone-invalid {
+            border-color: #e74c3c !important;
+
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.25) !important;
+        }
+
+        .phone-valid {
+            border-color: #2ecc71 !important;
+
+            box-shadow: 0 0 5px rgba(46, 204, 113, 0.25) !important;
+        }
+
+        /* =========================
+           Button
+        ========================= */
+
+        button {
+            margin-top: 25px;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background-color: #4a90e2;
+
+            color: white;
+
+            font-size: 18px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        /* 送出後 */
+        button:disabled {
+            background-color: #b9dcff;
+
+            color: white;
+
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           Footer
+        ========================= */
+
+        footer {
+            background-color: #333;
+
+            color: white;
+
+            text-align: center;
+
+            padding: 25px;
+
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 5px;
+        }
+
+        /* =========================
+           Mobile
+        ========================= */
+
+        @media (max-width: 767px) {
+
+            header h1 {
+                font-size: 32px;
+            }
+
+            nav a {
+                margin: 0 8px;
+
+                font-size: 14px;
+            }
+
+            main {
+                width: 90%;
+
+                grid-template-columns: 1fr;
+
+                gap: 16px;
+            }
+
+            section {
+                padding: 25px;
+            }
+
+            .phone-group {
+                flex-direction: column;
+            }
+
+            .country-code,
+            .phone-number {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!-- =========================
+         Header
+    ========================= -->
+
+    <header>
+
+        <h1>你好</h1>
+
+        <p>Welcome to my personal website</p>
+
+    </header>
+
+
+    <!-- =========================
+         Navigation
+    ========================= -->
+
+    <nav>
+
+        <a href="#about">個人資料</a>
+
+        <a href="#introduction">自我介紹</a>
+
+        <a href="#signup">報名表單</a>
+
+    </nav>
+
+
+    <!-- =========================
+         Main
+    ========================= -->
+
+    <main>
+
+        <!-- 個人資料 -->
+
+        <section id="about">
+
+            <h2>個人資料</h2>
+
+            <div class="info">
+
+                <p>
+                    <strong>姓名：</strong>你好
+                </p>
+
+                <p>
+                    <strong>學號：</strong>早安
+                </p>
+
+                <p>
+                    <strong>學校：</strong>我很好
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 自我介紹 -->
+
+        <section id="introduction">
+
+            <h2>自我介紹</h2>
+
+            <div class="introduction">
+
+                <p>
+                    大家好，我是你好。
+                </p>
+
+                <p>
+                    歡迎來到我的個人網站，
+                    很高興可以在這裡介紹自己。
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- 報名表單 -->
+
+        <section id="signup">
+
+            <h2>報名表單</h2>
+
+            <form id="signupForm">
+
+                <!-- =========================
+                     姓名
+                ========================= -->
+
+                <label for="name">
+                    姓名：
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="請輸入姓名"
+                    required
+                >
+
+
+                <!-- =========================
+                     Email
+                ========================= -->
+
+                <label for="email">
+                    Email：
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="請輸入 Email"
+                    required
+                >
+
+                <div
+                    id="emailError"
+                    class="email-error"
+                >
+                    Email 格式不正確，請輸入正確的 Email。
+                </div>
+
+
+                <!-- =========================
+                     電話
+                ========================= -->
+
+                <label>
+                    電話：
+                </label>
+
+                <div class="phone-group">
+
+                    <select
+                        id="countryCode"
+                        name="countryCode"
+                        class="country-code"
+                        required
+                    >
+
+                        <option value="">
+                            國家區碼
+                        </option>
+
+                        <option value="TW">
+                            🇹🇼 台灣 +886
+                        </option>
+
+                        <option value="JP">
+                            🇯🇵 日本 +81
+                        </option>
+
+                        <option value="KR">
+                            🇰🇷 韓國 +82
+                        </option>
+
+                        <option value="CN">
+                            🇨🇳 中國 +86
+                        </option>
+
+                        <option value="HK">
+                            🇭🇰 香港 +852
+                        </option>
+
+                        <option value="MO">
+                            🇲🇴 澳門 +853
+                        </option>
+
+                        <option value="SG">
+                            🇸🇬 新加坡 +65
+                        </option>
+
+                        <option value="MY">
+                            🇲🇾 馬來西亞 +60
+                        </option>
+
+                        <option value="US">
+                            🇺🇸 美國 +1
+                        </option>
+
+                        <option value="CA">
+                            🇨🇦 加拿大 +1
+                        </option>
+
+                        <option value="GB">
+                            🇬🇧 英國 +44
+                        </option>
+
+                        <option value="AU">
+                            🇦🇺 澳洲 +61
+                        </option>
+
+                        <option value="DE">
+                            🇩🇪 德國 +49
+                        </option>
+
+                        <option value="FR">
+                            🇫🇷 法國 +33
+                        </option>
+
+                    </select>
+
+
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        class="phone-number"
+                        placeholder="請輸入電話號碼"
+                        required
+                    >
+
+                </div>
+
+                <div
+                    id="phoneError"
+                    class="phone-error"
+                >
+                    電話號碼格式不正確，請確認國家及電話號碼。
+                </div>
+
+
+                <!-- =========================
+                     性別
+                ========================= -->
+
+                <label for="gender">
+                    性別：
+                </label>
+
+                <select
+                    id="gender"
+                    name="gender"
+                    required
+                >
+
+                    <option value="">
+                        請選擇
+                    </option>
+
+                    <option value="male">
+                        男
+                    </option>
+
+                    <option value="female">
+                        女
+                    </option>
+
+                    <option value="other">
+                        其他
+                    </option>
+
+                </select>
+
+
+                <!-- =========================
+                     備註
+                ========================= -->
+
+                <label for="message">
+                    備註：
+                </label>
+
+                <textarea
+                    id="message"
+                    name="message"
+                    rows="5"
+                    placeholder="請輸入其他想說的話"
+                ></textarea>
+
+
+                <!-- =========================
+                     Submit
+                ========================= -->
+
+                <button
+                    type="submit"
+                    id="submitBtn"
+                >
+                    送出報名
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         Footer
+    ========================= -->
+
+    <footer>
+
+        <p>我的自我介紹網站</p>
+
+        <p>© 2026 All Rights Reserved.</p>
+
+    </footer>
+
+
+    <!-- =========================
+         JavaScript
+    ========================= -->
+
+    <script>
+
+        const form = document.getElementById("signupForm");
+
+        const button = document.getElementById("submitBtn");
+
+        const email = document.getElementById("email");
+
+        const emailError = document.getElementById("emailError");
+
+        const countryCode = document.getElementById("countryCode");
+
+        const phone = document.getElementById("phone");
+
+        const phoneError = document.getElementById("phoneError");
+
+
+        /* =========================
+           Email 即時驗證
+        ========================= */
+
+        function checkEmail() {
+
+            const emailValue = email.value.trim();
+
+
+            /* 沒有輸入 */
+
+            if (emailValue === "") {
+
+                email.classList.remove("email-valid");
+
+                email.classList.add("email-invalid");
+
+                emailError.textContent = "請輸入 Email。";
+
+                emailError.style.display = "block";
+
+                return false;
+
+            }
+
+
+            /* 使用瀏覽器內建 Email 驗證 */
+
+            if (email.validity.valid) {
+
+                email.classList.remove("email-invalid");
+
+                email.classList.add("email-valid");
+
+                emailError.style.display = "none";
+
+                return true;
+
+            }
+
+
+            /* Email 格式錯誤 */
+
+            email.classList.remove("email-valid");
+
+            email.classList.add("email-invalid");
+
+            emailError.textContent =
+                "Email 格式不正確，請輸入例如 example@gmail.com";
+
+            emailError.style.display = "block";
+
+            return false;
+
+        }
+
+
+        /* 輸入 Email 時即時檢查 */
+
+        email.addEventListener("input", checkEmail);
+
+
+        /* =========================
+           電話即時驗證
+        ========================= */
+
+        function checkPhone() {
+
+            const country = countryCode.value;
+
+            const phoneNumber = phone.value.trim();
+
+
+            /* 沒有選擇國家 */
+
+            if (!country) {
+
+                phone.classList.remove("phone-valid");
+
+                phone.classList.add("phone-invalid");
+
+                phoneError.textContent = "請先選擇國家區碼。";
+
+                phoneError.style.display = "block";
+
+                return false;
+
+            }
+
+
+            /* 沒有輸入電話 */
+
+            if (!phoneNumber) {
+
+                phone.classList.remove("phone-valid");
+
+                phone.classList.add("phone-invalid");
+
+                phoneError.textContent = "請輸入電話號碼。";
+
+                phoneError.style.display = "block";
+
+                return false;
+
+            }
+
+
+            try {
+
+                const parsedNumber =
+                    libphonenumber.parsePhoneNumber(
+                        phoneNumber,
+                        country
+                    );
+
+
+                /* 電話符合該國規則 */
+
+                if (
+                    parsedNumber &&
+                    parsedNumber.isValid()
+                ) {
+
+                    phone.classList.remove("phone-invalid");
+
+                    phone.classList.add("phone-valid");
+
+                    phoneError.style.display = "none";
+
+                    return true;
+
+                }
+
+
+                /* 電話格式錯誤 */
+
+                phone.classList.remove("phone-valid");
+
+                phone.classList.add("phone-invalid");
+
+                phoneError.textContent =
+                    "電話號碼格式不正確，請確認國家及電話號碼。";
+
+                phoneError.style.display = "block";
+
+                return false;
+
+            }
+
+            catch (error) {
+
+                phone.classList.remove("phone-valid");
+
+                phone.classList.add("phone-invalid");
+
+                phoneError.textContent =
+                    "電話號碼格式不正確，請確認國家及電話號碼。";
+
+                phoneError.style.display = "block";
+
+                return false;
+
+            }
+
+        }
+
+
+        /* 輸入電話時即時檢查 */
+
+        phone.addEventListener("input", checkPhone);
+
+
+        /* 更換國家時重新檢查 */
+
+        countryCode.addEventListener(
+            "change",
+            checkPhone
+        );
+
+
+        /* =========================
+           表單送出
+        ========================= */
+
+        form.addEventListener(
+            "submit",
+            function(event) {
+
+                event.preventDefault();
+
+
+                /* 檢查 Email */
+
+                const emailOK = checkEmail();
+
+
+                /* 檢查電話 */
+
+                const phoneOK = checkPhone();
+
+
+                /* HTML required 欄位驗證 */
+
+                if (!form.checkValidity()) {
+
+                    form.reportValidity();
+
+                    return;
+
+                }
+
+
+                /* Email 或電話錯誤 */
+
+                if (!emailOK || !phoneOK) {
+
+                    return;
+
+                }
+
+
+                /* =========================
+                   成功送出
+                ========================= */
+
+                button.textContent = "送出!";
+
+                button.disabled = true;
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
